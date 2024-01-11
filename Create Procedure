@@ -1,0 +1,36 @@
+CREATE PROCEDURE dbo.DynamicSQL3 (@Filt INT, @AggFunction VARCHAR(32))
+
+AS
+
+BEGIN
+/**
+DECLARE @AggFunction VARCHAR(32)
+SET @AggFunction = 'SUM'
+**/
+	DECLARE @DynamicSQL2 VARCHAR(MAX)
+
+	DECLARE @Rank VARCHAR(32)
+	SET @Rank = 'DENSE_RANK()'
+	/**
+	DECLARE @Filt int
+	SET @Filt = 5
+	**/
+	SET @DynamicSQL2 = /** it comes from below query**/
+		'SELECT *
+		FROM (
+			SELECT
+				ProductName = B.[Name],
+				LineTotalSum = ' + @AggFunction + '(A.LineTotal),
+				 LineTotalRank = ' + @Rank + ' OVER (ORDER BY ' + @AggFunction + '(A.LineTotal) DESC)
+			FROM AdventureWorks2019.Sales.SalesOrderDetail A
+			INNER JOIN AdventureWorks2019.Production.Product B ON A.ProductID = B.ProductID
+			GROUP BY B.[Name]
+		) D
+		WHERE LineTotalRank <= '+ cast(@Filt as varchar)+ ''
+
+
+	EXEC (@DynamicSQL2) /** can generated code using this sript**/
+
+END
+
+EXEC dbo.DynamicSQL3 4, 'AVG'
