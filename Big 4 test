@@ -1,0 +1,41 @@
+use SQL_T
+go
+
+create table dbo.test
+(
+    year int,
+    company varchar(32),
+    amount int
+)
+
+insert into dbo.test
+values
+(2018, 'nokia', 1500),
+(2019, 'nokia', 1300),
+(2020, 'nokia', 1700),
+(2018, 'ht', 1800),
+(2019, 'ht', 1900),
+(2020, 'ht', 2100),
+(2018, 'iphone', 2100),
+(2019, 'iphone', 2000),
+(2020, 'iphone', 1900)
+
+
+with cte
+as (select *,
+           LEAD(amount) over (partition by company order by year asc) flag,
+           case
+               when LEAD(amount) over (partition by company order by year asc) IS null then
+                   1
+               when amount < LEAD(amount) over (partition by company order by year asc) then
+                   1
+               else
+                   0
+           end as index_x
+    from dbo.test
+   )
+select *
+from dbo.test
+where company not in (
+                         select company from cte where index_x = 0
+                     )
