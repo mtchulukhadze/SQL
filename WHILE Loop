@@ -1,0 +1,28 @@
+use [sql tutorial]
+go
+
+drop table if exists emp
+create table emp (
+	id nvarchar(50) ,
+	nam nvarchar(50),
+	email nvarchar(50),
+)
+
+set nocount on 
+
+declare @counter int = 1
+
+while (@counter <= 100000)
+
+begin
+	declare @name nvarchar(50) = 'abc' + rtrim(@counter)
+	declare @email nvarchar(50) = 'abc' + rtrim(@counter) + '@gmail'
+	declare @dep nvarchar(50) = 'dep' + rtrim(@counter)
+
+	insert into emp values (@name, @email, @dep)
+
+	set @counter = @counter + 1
+
+	if (@counter%10 = 0)
+		print rtrim(@counter) + 'inserted'
+end
