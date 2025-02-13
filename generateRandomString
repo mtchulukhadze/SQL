@@ -1,0 +1,18 @@
+CREATE TABLE #TempRandomData (
+    ID INT,
+    RandomText NVARCHAR(max)
+);
+
+DECLARE @Counter INT = 1;
+DECLARE @MaxRows INT = 50;
+
+WHILE @Counter <= @MaxRows
+BEGIN
+    INSERT INTO #TempRandomData (ID, RandomText)
+	SELECT @Counter, NEWID();
+
+    SET @Counter = @Counter + 1;
+END
+
+SELECT * FROM #TempRandomData;
+DROP TABLE #TempRandomData;
